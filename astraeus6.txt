@@ -1,0 +1,523 @@
+//////////////////////////////////////////////////
+MyTeam/units/Fighter
+//////////////////////////////////////////////////
+package teams.student.MyTeam.units;
+import components.upgrade.Plating;
+import components.upgrade.Shield;
+import components.weapon.energy.Laser;
+import components.weapon.kinetic.Autocannon;
+import components.weapon.kinetic.HeavyAutocannon;
+import objects.entity.unit.Frame;
+import objects.entity.unit.Model;
+import objects.entity.unit.Style;
+import teams.student.MyTeam.GooniesUnit;
+public class Fighter extends GooniesUnit
+
+	/*
+	YOU'RE VERY WELCOME FOR CLEANING THE CODE.
+
+	- Yuri
+	 */
+
+{
+	public void design()
+	{
+		setFrame(Frame.ASSAULT);
+		setModel(Model.CRUISER);
+		setStyle(Style.ARROW);
+
+		add(HeavyAutocannon.class);
+		add(Laser.class);
+		add(Shield.class);
+		add(Plating.class);
+	}
+}
+//////////////////////////////////////////////////
+MyTeam/units/Fixer
+//////////////////////////////////////////////////
+package teams.student.MyTeam.units;
+import components.upgrade.Plating;
+import components.weapon.utility.RepairBeam;
+import objects.entity.unit.Frame;
+import objects.entity.unit.Model;
+import objects.entity.unit.Style;
+import objects.entity.unit.Unit;
+import teams.student.MyTeam.GooniesUnit;
+public class Fixer extends GooniesUnit
+
+    /*
+	YOU'RE VERY WELCOME FOR CLEANING THE CODE.
+
+	- Yuri
+	 */
+
+{
+
+
+    public void design()
+    {
+        setFrame(Frame.HEAVY);
+        setModel(Model.BASTION);
+        setStyle(Style.SHARK);
+        add(RepairBeam.class);
+        add(Plating.class);
+        add(Plating.class);
+    }
+    public void action()
+    {
+        Unit ally = getHealTarget();
+        if(ally != null)
+        {
+            moveTo(ally);
+            getWeaponOne().use(ally);
+        }
+        else
+        {
+            moveTo(getHomeBase());
+        }
+    }
+    public Unit getHealTarget()
+    {
+        Unit target = null;
+        double lowestHealth = 1.0;
+        for(Unit u : getAllies())
+        {
+            if(u != this && u.getPercentEffectiveHealth() < 1.0)
+            {
+                double hp = u.getPercentEffectiveHealth();
+                if (hp < lowestHealth)
+                {
+                    lowestHealth = hp;
+                    target = u;
+                }
+            }
+        }
+        return target;
+    }
+}
+//////////////////////////////////////////////////
+MyTeam/units/Gatherer
+//////////////////////////////////////////////////
+package teams.student.MyTeam.units;
+import components.weapon.economy.Collector;
+import objects.entity.unit.Frame;
+import objects.entity.unit.Model;
+import objects.entity.unit.Style;
+import objects.resource.Resource;
+import teams.student.MyTeam.GooniesUnit;
+import objects.entity.unit.Unit;
+public class Gatherer extends GooniesUnit
+
+	/*
+	YOU'RE VERY WELCOME FOR CLEANING THE CODE.
+
+	- Yuri
+	 */
+
+{
+	public void design()
+	{
+		setFrame(Frame.LIGHT);
+		setModel(Model.TRANSPORT);
+		setStyle(Style.BUBBLE);
+		add(Collector.class);
+	}
+	public void action()
+	{
+		Unit enemy = getNearestEnemy();
+		if (enemy != null && getDistance(enemy) < 500) {
+			moveTo(getHomeBase());
+		} else {
+			returnResources();
+			gatherResources();
+		}
+	}
+	public void returnResources()
+	{
+		if(isFull())
+		{
+			moveTo(getHomeBase());
+			deposit();
+		}
+	}
+	public void gatherResources()
+	{
+		if(hasCapacity())
+		{
+			Resource r = getNearestResource();
+
+			if(r != null) {
+				moveTo(r);
+				((Collector) getWeaponOne()).use(r);
+			}
+		}
+	}
+}
+//////////////////////////////////////////////////
+MyTeam/units/Miner
+//////////////////////////////////////////////////
+package teams.student.MyTeam.units;
+import components.weapon.Weapon;
+import components.weapon.economy.Drillbeam;
+import objects.entity.unit.Frame;
+import objects.entity.unit.Model;
+import objects.entity.unit.Style;
+import objects.entity.node.Node;
+import teams.student.MyTeam.GooniesUnit;
+import objects.entity.unit.Unit;
+public class Miner extends GooniesUnit
+
+	/*
+	YOU'RE VERY WELCOME FOR CLEANING THE CODE.
+
+	- Yuri
+	 */
+
+{
+	public void design()
+	{
+		setFrame(Frame.LIGHT);
+		setModel(Model.DESTROYER);
+		setStyle(Style.BOXY);
+		add(Drillbeam.class);
+	}
+	public void action()
+	{
+		Unit enemy = getNearestEnemy();
+		if (enemy != null && getDistance(enemy) < 500) {
+			moveTo(getHomeBase());
+		} else {
+			harvest(getNearestNode(), getWeaponOne());
+		}
+	}
+	public void harvest(Node n, Weapon w)
+	{
+		if(getDistance(n) > w.getMaxRange() * .5f)
+		{
+			moveTo(n);
+		}
+		else if(getDistance(n) < w.getMinRange() * 1.5f)
+		{
+			turnTo(n);
+			turnAround();
+			move();
+		}
+		w.use(n);
+	}
+}
+//////////////////////////////////////////////////
+MyTeam/units/Skirmisher
+//////////////////////////////////////////////////
+package teams.student.MyTeam.units;
+import components.upgrade.Shield;
+import components.weapon.kinetic.Autocannon;
+import objects.entity.unit.Frame;
+import objects.entity.unit.Model;
+import objects.entity.unit.Style;
+import teams.student.MyTeam.GooniesUnit;
+
+/*
+	YOU'RE VERY WELCOME FOR CLEANING THE CODE.
+
+	- Yuri
+	 */
+
+public class Skirmisher extends GooniesUnit
+{
+    public void design() {
+        setFrame(Frame.LIGHT);
+        setModel(Model.CRUISER);
+        setStyle(Style.ARROW);
+        add(Autocannon.class);
+        add(Shield.class);
+    }
+}
+//////////////////////////////////////////////////
+MyTeam/units/Sniper
+//////////////////////////////////////////////////
+package teams.student.MyTeam.units;
+import components.upgrade.Plating;
+import components.upgrade.Shield;
+import components.weapon.energy.HeavyLaser;
+import components.weapon.kinetic.Autocannon;
+import objects.entity.unit.Frame;
+import objects.entity.unit.Model;
+import objects.entity.unit.Style;
+import teams.student.MyTeam.GooniesUnit;
+import components.weapon.Weapon;
+import objects.entity.unit.Unit;
+public class Sniper extends GooniesUnit
+
+    /*
+	YOU'RE VERY WELCOME FOR CLEANING THE CODE.
+
+	- Yuri
+	 */
+
+{
+    public void design()
+    {
+        setFrame(Frame.HEAVY);
+        setModel(Model.ARTILLERY);
+        setStyle(Style.CANNON);
+        add(HeavyLaser.class);
+        add(Shield.class);
+        add(Plating.class);
+    }
+    public void action()
+    {
+        Unit enemy = getNearestEnemy();
+        if (enemy != null) {
+            Weapon w = getWeaponOne();
+            if (w != null) {
+                double dist = getDistance(enemy);
+                double maxR = w.getMaxRange();
+                double minR = w.getMinRange();
+                if (dist > maxR) {
+                    moveTo(enemy);
+                } else if (dist < maxR * 0.8 || dist < minR * 1.5) {
+                    turnTo(enemy);
+                    turnAround();
+                    move();
+                } else {
+                    turnTo(enemy);
+                }
+                w.use(enemy);
+            }
+            attack(getWeaponTwo());
+        }
+    }
+}
+//////////////////////////////////////////////////
+MyTeam/units/Tank
+//////////////////////////////////////////////////
+package teams.student.MyTeam.units;
+import components.upgrade.Plating;
+import components.upgrade.Shield;
+import components.weapon.energy.Laser;
+import components.weapon.kinetic.Autocannon;
+import components.weapon.kinetic.HeavyAutocannon;
+import objects.entity.unit.Frame;
+import objects.entity.unit.Model;
+import objects.entity.unit.Style;
+import teams.student.MyTeam.GooniesUnit;
+import components.weapon.Weapon;
+import objects.entity.unit.Unit;
+public class Tank extends GooniesUnit
+
+
+    /*
+	YOU'RE VERY WELCOME FOR CLEANING THE CODE.
+
+	- Yuri
+	 */
+
+{
+    public void design()
+    {
+        setFrame(Frame.HEAVY);
+        setModel(Model.DESTROYER);
+        setStyle(Style.CRESCENT);
+        add(HeavyAutocannon.class);
+        //add(Laser.class);
+        add(Shield.class);
+        add(Plating.class);
+    }
+    public void action()
+    {
+        Unit enemy = getNearestEnemy();
+        if (enemy != null) {
+            Weapon w = getWeaponOne();
+            if (w != null) {
+                double dist = getDistance(enemy);
+                double maxR = w.getMaxRange();
+                if (dist > maxR * 0.5) {
+                    moveTo(enemy);
+                } else {
+                    turnTo(enemy);
+                }
+                w.use(enemy);
+            }
+            attack(getWeaponTwo());
+        }
+    }
+}
+//////////////////////////////////////////////////
+MyTeam/Goonies
+//////////////////////////////////////////////////
+package teams.student.MyTeam;
+import org.newdawn.slick.Graphics;
+import player.Player;
+import teams.student.MyTeam.units.*;
+import java.util.List;
+import objects.entity.unit.Unit;
+import objects.entity.unit.Frame;
+
+/*
+	YOU'RE VERY WELCOME FOR CLEANING THE CODE.
+
+	- Yuri
+	 */
+
+public class Goonies extends Player
+{
+	public void setup()
+	{
+		setName("The Goonies");
+		setTeamImage("src/teams/student/myTeam/teamLogo.png");
+		setTitle("Goon Team");
+		setColorPrimary(50, 125, 255);
+		setColorSecondary(255, 255, 255);
+		setColorAccent(255, 255, 255);
+	}
+	public void strategy()
+	{
+		float gathererPct = getFleetValueUnitPercentage(Gatherer.class);
+		float minerPct = getFleetValueUnitPercentage(Miner.class);
+		float fixerPct = getFleetValueUnitPercentage(Fixer.class);
+		float sniperPct = getFleetValueUnitPercentage(Sniper.class);
+		float tankPct = getFleetValueUnitPercentage(Tank.class);
+		float skirmisherPct = getFleetValueUnitPercentage(Skirmisher.class);
+		float fighterPct = getFleetValueUnitPercentage(Fighter.class);
+
+		List<Unit> myUnits = getUnits(this, Unit.class);
+		int myCount = myUnits.size();
+
+		Player opponent = getOpponent();
+		List<Unit> enemies = getUnits(opponent, Unit.class);
+		int enemyCount = enemies.size();
+
+		int enemyLight = 0, enemyAssault = 0, enemyHeavy = 0;
+		for (Unit e : enemies) {
+			if (e.isAlive()) {
+				Frame f = e.getFrame();
+				if (f == Frame.LIGHT) enemyLight++;
+				else if (f == Frame.ASSAULT) enemyAssault++;
+				else if (f == Frame.HEAVY) enemyHeavy++;
+			}
+		}
+
+		boolean earlyGame = myCount < 20;
+		boolean superior = myCount > enemyCount * 1.5 || enemyCount < 10;
+		boolean threatened = enemyHeavy + enemyAssault > myCount * 0.3 || enemyCount > myCount * 1.2;
+
+		if (earlyGame || !threatened) {
+			if (gathererPct < 0.3f) {
+				buildUnit(Gatherer.class);
+			} else if (minerPct < 0.3f) {
+				buildUnit(Miner.class);
+			} else if (fixerPct < 0.15f) {
+				buildUnit(Fixer.class);
+			} else {
+				buildUnit(Fighter.class);
+			}
+		} else if (threatened) {
+
+			if (gathererPct < 0.2f) {
+				buildUnit(Gatherer.class);
+			} else if (minerPct < 0.2f) {
+				buildUnit(Miner.class);
+			} else if (fixerPct < 0.25f) {
+				buildUnit(Fixer.class);
+			} else if (tankPct < 0.15f && (enemyAssault > 0 || enemyHeavy > 0)) {
+				buildUnit(Tank.class);
+			} else if (sniperPct < 0.15f && enemyHeavy > 0) {
+				buildUnit(Sniper.class);
+			} else {
+				buildUnit(Fighter.class);
+			}
+		} else if (superior) {
+			if (gathererPct < 0.15f) {
+				buildUnit(Gatherer.class);
+			} else if (minerPct < 0.15f) {
+				buildUnit(Miner.class);
+			} else if (fixerPct < 0.1f) {
+				buildUnit(Fixer.class);
+			} else if (skirmisherPct < 0.1f && enemyLight > 0) {
+				buildUnit(Skirmisher.class);
+			} else if (tankPct < 0.1f && enemyAssault > 0) {
+				buildUnit(Tank.class);
+			} else if (sniperPct < 0.1f && enemyHeavy > 0) {
+				buildUnit(Sniper.class);
+			} else {
+				buildUnit(Fighter.class);
+			}
+		} else {
+			if (gathererPct < 0.25f) {
+				buildUnit(Gatherer.class);
+			} else if (minerPct < 0.25f) {
+				buildUnit(Miner.class);
+			} else if (fixerPct < 0.2f) {
+				buildUnit(Fixer.class);
+			} else if (sniperPct < 0.1f) {
+				buildUnit(Sniper.class);
+			} else if (tankPct < 0.1f) {
+				buildUnit(Tank.class);
+			} else if (skirmisherPct < 0.1f) {
+				buildUnit(Skirmisher.class);
+			} else {
+				buildUnit(Fighter.class);
+			}
+		}
+	}
+	public void draw(Graphics g)
+	{
+	}
+}
+//////////////////////////////////////////////////
+MyTeam/GooniesUnit
+//////////////////////////////////////////////////
+package teams.student.MyTeam;
+import components.weapon.Weapon;
+import objects.entity.unit.Unit;
+import org.newdawn.slick.Graphics;
+public abstract class GooniesUnit extends Unit
+
+	/*
+	YOU'RE VERY WELCOME FOR CLEANING THE CODE.
+
+	- Yuri
+	 */
+
+
+{
+	public Goonies getPlayer()
+	{
+		return (Goonies) super.getPlayer();
+	}
+	public void action()
+	{
+		attack(getWeaponOne());
+		attack(getWeaponTwo());
+		movement();
+	}
+	public void attack(Weapon w)
+	{
+		Unit enemy = getNearestEnemy();
+		if(enemy != null && w != null)
+		{
+			w.use(enemy);
+		}
+	}
+	public void movement()
+	{
+		Unit enemy = getNearestEnemy();
+		if(enemy != null)
+		{
+			if(getDistance(enemy) > getMaxRange())
+			{
+				moveTo(enemy);
+			}
+			else
+			{
+				turnTo(enemy);
+				turnAround();
+				move();
+			}
+		}
+	}
+	public void draw(Graphics g)
+	{
+	}
+}
+//////////////////////////////////////////////////
